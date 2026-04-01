@@ -1,0 +1,9 @@
+{
+  "name": "ai-skills",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Full-stack SDLC agent skills library for React+Vite, Node.js, PostgreSQL, Railway",
+  "scripts": {
+    "build:ui": "node scripts/build-ui.js"
+  }
+}

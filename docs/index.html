@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ai-skills — SDLC Skills Library</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #0f172a;
+      --ink-muted: #64748b;
+      --ink-faint: #94a3b8;
+      --bg: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-sidebar: #0f172a;
+      --border: #e2e8f0;
+      --accent: #f59e0b;
+      --accent-dim: #fef3c7;
+      --phase-develop: #dcfce7;
+      --phase-test: #dbeafe;
+      --phase-quality: #fce7f3;
+      --phase-build: #ede9fe;
+      --phase-deploy: #fff7ed;
+      --phase-ref: #f1f5f9;
+      --sidebar-w: 280px;
+      --header-h: 60px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      height: var(--header-h);
+      background: var(--bg-sidebar);
+      display: flex;
+      align-items: center;
+      padding: 0 1.5rem;
+      gap: 1rem;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    .logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.25rem;
+      color: #f8fafc;
+      letter-spacing: -0.01em;
+    }
+
+    .logo span { color: var(--accent); }
+
+    .header-meta {
+      margin-left: auto;
+      font-size: 0.75rem;
+      color: #64748b;
+      font-family: 'DM Mono', monospace;
+    }
+
+    .header-meta a { color: #94a3b8; text-decoration: none; }
+    .header-meta a:hover { color: var(--accent); }
+
+    /* ── Layout ── */
+    .layout {
+      display: flex;
+      margin-top: var(--header-h);
+      min-height: calc(100vh - var(--header-h));
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--bg-sidebar);
+      position: fixed;
+      top: var(--header-h);
+      bottom: 0;
+      left: 0;
+      overflow-y: auto;
+      padding: 1rem 0 2rem;
+      scrollbar-width: thin;
+      scrollbar-color: #334155 transparent;
+    }
+
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+
+    .search-wrap {
+      padding: 0.75rem 1rem;
+      position: sticky;
+      top: 0;
+      background: var(--bg-sidebar);
+      z-index: 1;
+    }
+
+    .search {
+      width: 100%;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      padding: 0.5rem 0.75rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: #e2e8f0;
+      outline: none;
+    }
+
+    .search::placeholder { color: #475569; }
+    .search:focus { border-color: var(--accent); }
+
+    .phase-group { margin-bottom: 0.25rem; }
+
+    .phase-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #475569;
+      padding: 0.75rem 1rem 0.25rem;
+    }
+
+    .skill-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      border-left: 2px solid transparent;
+      transition: background 0.1s, border-color 0.1s;
+    }
+
+    .skill-item:hover { background: #1e293b; }
+
+    .skill-item.active {
+      background: #1e293b;
+      border-left-color: var(--accent);
+    }
+
+    .skill-name {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem;
+      color: #cbd5e1;
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .skill-item.active .skill-name { color: #f8fafc; }
+
+    .source-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ── Main Content ── */
+    main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Welcome screen ── */
+    .welcome {
+      padding: 3rem 2.5rem;
+      max-width: 860px;
+    }
+
+    .welcome h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2.5rem;
+      line-height: 1.2;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.02em;
+    }
+
+    .welcome h1 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+
+    .welcome .subtitle {
+      font-size: 1rem;
+      color: var(--ink-muted);
+      margin-bottom: 2.5rem;
+      line-height: 1.6;
+    }
+
+    /* ── SDLC Flow ── */
+    .flow-section { margin-bottom: 2.5rem; }
+
+    .flow-section h2 {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-bottom: 1rem;
+    }
+
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .flow-step {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .flow-pill {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      padding: 0.3rem 0.65rem;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      cursor: pointer;
+      transition: all 0.15s;
+      color: var(--ink);
+    }
+
+    .flow-pill:hover {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+    }
+
+    .flow-arrow {
+      color: var(--ink-faint);
+      font-size: 0.85rem;
+    }
+
+    /* ── Stats grid ── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+    }
+
+    .stat-value {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2rem;
+      line-height: 1;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--ink-muted);
+    }
+
+    /* ── Skills grid ── */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1rem;
+    }
+
+    .skill-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.1rem 1.25rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .skill-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 4px 12px rgba(245,158,11,0.1);
+      transform: translateY(-1px);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .card-name {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--ink);
+      flex: 1;
+    }
+
+    .phase-badge {
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      padding: 0.2rem 0.45rem;
+      border-radius: 3px;
+      white-space: nowrap;
+    }
+
+    .card-desc {
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* ── Skill detail view ── */
+    .skill-detail {
+      padding: 2rem 2.5rem;
+      max-width: 860px;
+      display: none;
+    }
+
+    .skill-detail.visible { display: block; }
+
+    .detail-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .detail-title {
+      font-family: 'DM Mono', monospace;
+      font-size: 1.4rem;
+      font-weight: 500;
+      flex: 1;
+    }
+
+    .detail-badges { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.4rem; }
+
+    .badge {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      padding: 0.2rem 0.55rem;
+      border-radius: 3px;
+    }
+
+    .back-btn {
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+      cursor: pointer;
+      padding: 0.4rem 0.8rem;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      background: none;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .back-btn:hover { border-color: var(--accent); color: var(--ink); }
+
+    /* ── Markdown render ── */
+    .md-body { line-height: 1.75; }
+
+    .md-body h1 { font-family: 'DM Serif Display', serif; font-size: 1.6rem; margin: 2rem 0 0.75rem; letter-spacing: -0.01em; }
+    .md-body h2 { font-size: 1.05rem; font-weight: 600; margin: 1.75rem 0 0.6rem; padding-top: 0.5rem; border-top: 1px solid var(--border); }
+    .md-body h3 { font-size: 0.9rem; font-weight: 600; margin: 1.25rem 0 0.4rem; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .md-body p { margin: 0.6rem 0; font-size: 0.9rem; }
+    .md-body ul, .md-body ol { padding-left: 1.4rem; margin: 0.5rem 0; }
+    .md-body li { font-size: 0.88rem; margin: 0.25rem 0; }
+    .md-body code { font-family: 'DM Mono', monospace; font-size: 0.82rem; background: #f1f5f9; padding: 0.1em 0.4em; border-radius: 3px; color: #0f172a; }
+    .md-body pre { background: #0f172a; border-radius: 8px; padding: 1rem 1.25rem; overflow-x: auto; margin: 1rem 0; }
+    .md-body pre code { background: none; padding: 0; color: #e2e8f0; font-size: 0.82rem; }
+    .md-body table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem; }
+    .md-body th { background: #f1f5f9; padding: 0.5rem 0.75rem; text-align: left; font-weight: 600; border: 1px solid var(--border); }
+    .md-body td { padding: 0.45rem 0.75rem; border: 1px solid var(--border); }
+    .md-body tr:nth-child(even) td { background: #f8fafc; }
+    .md-body blockquote { border-left: 3px solid var(--accent); padding-left: 1rem; color: var(--ink-muted); margin: 1rem 0; font-style: italic; }
+    .md-body a { color: #0369a1; text-decoration: none; }
+    .md-body a:hover { text-decoration: underline; }
+    .md-body strong { font-weight: 600; }
+
+    /* ── Phase badge colors ── */
+    .p-spec    { background: #fef9c3; color: #92400e; }
+    .p-scaffold{ background: #f0fdf4; color: #166534; }
+    .p-develop { background: #dcfce7; color: #15803d; }
+    .p-review  { background: #ede9fe; color: #6d28d9; }
+    .p-test    { background: #dbeafe; color: #1d4ed8; }
+    .p-quality { background: #fce7f3; color: #9d174d; }
+    .p-build   { background: #fff7ed; color: #c2410c; }
+    .p-deploy  { background: #ecfdf5; color: #065f46; }
+    .p-ref     { background: #f1f5f9; color: #475569; }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      main { margin-left: 0; }
+      .welcome, .skill-detail { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">ai<span>-skills</span></div>
+  <div class="header-meta">
+    <a href="https://github.com/sanjeev23oct/ai-skills" target="_blank">github.com/sanjeev23oct/ai-skills</a>
+    &nbsp;·&nbsp; 14 skills &nbsp;·&nbsp; <a href="https://agentskills.io" target="_blank">agentskills.io</a>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar">
+    <div class="search-wrap">
+      <input class="search" type="text" placeholder="search skills..." id="searchInput">
+    </div>
+    <div id="sidebarList"></div>
+  </nav>
+
+  <main id="main">
+    <!-- Welcome -->
+    <div class="welcome" id="welcomeView">
+      <h1>Full-Stack SDLC<br><em>Agent Skills</em></h1>
+      <p class="subtitle">
+        14 skills covering the entire development lifecycle — from spec to deploy.
+        Auto-discovered by Claude Code, Kiro, Gemini, and any <a href="https://agentskills.io" target="_blank">agentskills.io</a>-compatible agent.
+      </p>
+
+      <div class="flow-section">
+        <h2>SDLC Flow</h2>
+        <div class="flow" id="sdlcFlow"></div>
+      </div>
+
+      <div class="stats" id="statsGrid"></div>
+
+      <div class="flow-section">
+        <h2>All Skills</h2>
+        <div class="skills-grid" id="skillsGrid"></div>
+      </div>
+    </div>
+
+    <!-- Skill detail -->
+    <div class="skill-detail" id="detailView">
+      <div class="detail-header">
+        <div>
+          <div class="detail-title" id="detailTitle"></div>
+          <div class="detail-badges" id="detailBadges"></div>
+        </div>
+        <button class="back-btn" onclick="showWelcome()">← All skills</button>
+      </div>
+      <div class="md-body" id="detailBody"></div>
+    </div>
+  </main>
+</div>
+
+<script>
+const SKILLS = [{"name":"spec-writer","description":"Write a structured feature spec before any code is written. Use this skill when starting any new feature, bug fix, or API change. Produces a spec document that all subsequent SDLC skills reference.","source":"ai-skills","phase":"1 — Spec","order":1,"body":"# Spec Writer\n\nWrite a complete feature specification before touching any code. This is the entry point of the SDLC. No code skill should run without a spec.\n\n## Trigger Conditions\n- User says \"build X\", \"add feature X\", \"implement X\", \"create X\"\n- Any new React component, API endpoint, DB migration, or user story\n\n## Output Artifact\nCreate `specs/<feature-slug>.spec.md` in the project root.\n\n## Steps\n\n### 1. Clarify Requirements\nAsk the user (or infer from context) the following — do NOT skip:\n- **What** is being built (user-facing feature or internal?)\n- **Who** uses it (persona / role)\n- **Why** it is needed (problem being solved)\n- **Acceptance criteria** — observable, testable outcomes\n- **Out of scope** — what this spec explicitly excludes\n\n### 2. Write the Spec Document\n\nUse this exact template:\n\n```markdown\n# Spec: <Feature Name>\n\n## Status\nDraft | Review | Approved\n\n## Summary\nOne paragraph describing what is being built and why.\n\n## User Story\nAs a <persona>, I want to <action> so that <outcome>.\n\n## Acceptance Criteria\n- [ ] AC1: <specific, testable criterion>\n- [ ] AC2: ...\n- [ ] AC3: ...\n\n## Technical Scope\n\n### Frontend\n- Components to create/modify\n- Routes affected\n- Accessibility requirements (WCAG 2.1 AA)\n- Responsive breakpoints (mobile 320px, tablet 768px, desktop 1280px)\n\n### Backend\n- API endpoints (method, path, request/response shape)\n- Authentication/authorization rules\n\n### Database\n- Tables/columns to add or modify\n- Migrations required\n- Indexes needed\n\n## Non-Functional Requirements\n- Performance: (e.g., page load < 2s, API response < 200ms)\n- Accessibility: WCAG 2.1 AA compliance required\n- Security: (e.g., input validation, SQL injection prevention)\n\n## Test Plan\n- Unit tests: what functions/components need tests\n- E2E tests: what Playwright scenarios to cover\n- A11y tests: axe-core scan on all new pages/components\n\n## Open Questions\n- [ ] Question 1\n- [ ] Question 2\n\n## Definition of Done\n- [ ] All acceptance criteria met\n- [ ] Unit test coverage >= 80%\n- [ ] Playwright E2E tests pass\n- [ ] axe-core reports 0 violations\n- [ ] ESLint + TypeScript strict: 0 errors\n- [ ] Docker build succeeds\n- [ ] Deployed to Railway staging, health check passes\n```\n\n### 3. Verify Before Proceeding\n- Spec file exists at `specs/<feature-slug>.spec.md`\n- All acceptance criteria are specific and testable (not vague like \"it works\")\n- Test plan section is filled in\n- Definition of Done checklist is complete\n\n### 4. Gate\n**Do not proceed to any coding skill until the spec is written and the user confirms it is correct.**\n\nOutput to user:\n```\nSpec written: specs/<feature-slug>.spec.md\nNext step: run `react-component`, `api-endpoint`, or `project-scaffold` skill\n```"},{"name":"project-scaffold","description":"Scaffold a new full-stack project with React+Vite frontend and Node.js backend. Use this when starting a brand new project or adding a new service. Sets up folder structure, TypeScript, ESLint, Prettier, and base configs.","source":"ai-skills","phase":"2 — Scaffold","order":2,"body":"# Project Scaffold\n\nBootstrap a production-ready full-stack project. Always run after `spec-writer`. Never scaffold without an approved spec.\n\n## Trigger Conditions\n- User says \"create new project\", \"scaffold app\", \"init project\"\n- No `package.json` exists in the target directory\n\n## Prerequisites\n- `specs/<feature-slug>.spec.md` exists and is approved\n\n## Steps\n\n### 1. Confirm Spec Exists\n```bash\nls specs/*.spec.md || echo \"ERROR: No spec found. Run spec-writer first.\"\n```\n**Gate:** Stop if no spec exists.\n\n### 2. Scaffold Frontend (React + Vite + TypeScript)\n```bash\nnpm create vite@latest frontend -- --template react-ts\ncd frontend\nnpm install\nnpm install -D \\\n  eslint @eslint/js eslint-plugin-react eslint-plugin-react-hooks \\\n  eslint-plugin-jsx-a11y \\\n  @typescript-eslint/eslint-plugin @typescript-eslint/parser \\\n  prettier eslint-config-prettier \\\n  vitest @vitest/ui @vitest/coverage-v8 \\\n  @testing-library/react @testing-library/user-event @testing-library/jest-dom \\\n  axe-core @axe-core/react \\\n  playwright @playwright/test\nnpm install \\\n  react-router-dom \\\n  @tanstack/react-query \\\n  axios\n```\n\n### 3. Frontend Config Files\n\n**`frontend/vite.config.ts`**\n```ts\nimport { defineConfig } from 'vite'\nimport react from '@vitejs/plugin-react'\n\nexport default defineConfig({\n  plugins: [react()],\n  test: {\n    globals: true,\n    environment: 'jsdom',\n    setupFiles: ['./src/test/setup.ts'],\n    coverage: {\n      provider: 'v8',\n      reporter: ['text', 'json', 'html'],\n      thresholds: { lines: 80, functions: 80, branches: 80, statements: 80 }\n    }\n  }\n})\n```\n\n**`frontend/.eslintrc.cjs`**\n```js\nmodule.exports = {\n  root: true,\n  env: { browser: true, es2020: true },\n  extends: [\n    'eslint:recommended',\n    'plugin:@typescript-eslint/strict',\n    'plugin:react/recommended',\n    'plugin:react-hooks/recommended',\n    'plugin:jsx-a11y/strict',\n    'prettier'\n  ],\n  plugins: ['react-refresh', 'jsx-a11y'],\n  rules: {\n    'react/react-in-jsx-scope': 'off',\n    'react-refresh/only-export-components': 'warn'\n  }\n}\n```\n\n**`frontend/src/test/setup.ts`**\n```ts\nimport '@testing-library/jest-dom'\n```\n\n### 4. Scaffold Backend (Node.js + TypeScript)\n```bash\nmkdir backend && cd backend\nnpm init -y\nnpm install express cors helmet dotenv pg\nnpm install -D \\\n  typescript ts-node nodemon \\\n  @types/express @types/cors @types/node @types/pg \\\n  eslint @typescript-eslint/eslint-plugin @typescript-eslint/parser \\\n  prettier \\\n  vitest\nnpx tsc --init --strict --target ES2022 --module commonjs --outDir dist --rootDir src\n```\n\n**`backend/src/index.ts`**\n```ts\nimport express from 'express'\nimport cors from 'cors'\nimport helmet from 'helmet'\n\nconst app = express()\nconst PORT = process.env.PORT || 3001\n\napp.use(helmet())\napp.use(cors())\napp.use(express.json())\n\napp.get('/health', (_req, res) => {\n  res.json({ status: 'ok', timestamp: new Date().toISOString() })\n})\n\napp.listen(PORT, () => console.log(`Server running on port ${PORT}`))\n\nexport default app\n```\n\n### 5. Root Docker Compose (Development)\n**`docker-compose.yml`**\n```yaml\nversion: '3.9'\nservices:\n  db:\n    image: postgres:16-alpine\n    environment:\n      POSTGRES_DB: appdb\n      POSTGRES_USER: appuser\n      POSTGRES_PASSWORD: apppassword\n    ports:\n      - \"5432:5432\"\n    volumes:\n      - pgdata:/var/lib/postgresql/data\n\n  backend:\n    build: ./backend\n    ports:\n      - \"3001:3001\"\n    environment:\n      DATABASE_URL: postgres://appuser:apppassword@db:5432/appdb\n    depends_on:\n      - db\n\n  frontend:\n    build: ./frontend\n    ports:\n      - \"5173:5173\"\n    depends_on:\n      - backend\n\nvolumes:\n  pgdata:\n```\n\n### 6. Root `.env.example`\n```\nDATABASE_URL=postgres://appuser:apppassword@localhost:5432/appdb\nPORT=3001\nNODE_ENV=development\nRAILWAY_TOKEN=\n```\n\n### 7. Git Init and Initial Commit\n```bash\ngit init\necho \"node_modules/\\ndist/\\n.env\\ncoverage/\\nplaywright-report/\" > .gitignore\ngit add .\ngit commit -m \"chore: initial project scaffold\"\n```\n\n### 8. Verification Gate\n```bash\n# Frontend compiles\ncd frontend && npm run build && echo \"FRONTEND BUILD: OK\"\n\n# Backend compiles\ncd ../backend && npx tsc --noEmit && echo \"BACKEND TS: OK\"\n\n# Lint passes\ncd ../frontend && npm run lint && echo \"FRONTEND LINT: OK\"\ncd ../backend && npm run lint && echo \"BACKEND LINT: OK\"\n```\n\n**Gate:** All 4 checks must pass before moving to next skill.\n\n## Artifacts Produced\n- `frontend/` — Vite + React + TS project\n- `backend/` — Node.js + Express + TS project\n- `docker-compose.yml` — local dev environment\n- `.gitignore`, `.env.example`"},{"name":"react-component","description":"Build production-grade React + Vite + TypeScript components with WCAG 2.1 AA accessibility, responsiveness across mobile/tablet/desktop, and clean design. Use when creating new UI components, pages, or interactive features. Includes a11y checks and unit test generation.","source":"ai-skills","phase":"3 — Develop","order":3,"body":"# React Component Builder\n\nBuild accessible, responsive, production-grade React components for the Vite + TypeScript stack.\n\n## Trigger Conditions\n- \"Build a [component/page/form/dashboard]\"\n- \"Create a React component for X\"\n- \"Add a UI for X\"\n\n## Prerequisites\n- `specs/<feature-slug>.spec.md` approved\n- `project-scaffold` has been run (frontend/ directory exists)\n\n## Steps\n\n### 1. Read the Spec\nOpen `specs/<feature-slug>.spec.md` and extract:\n- Component name and purpose\n- Acceptance criteria\n- A11y requirements\n- Responsive breakpoints\n\n### 2. Design Thinking (Before Coding)\nCommit to a clear aesthetic direction — avoid generic \"AI slop\":\n- **Purpose**: What problem does this UI solve?\n- **Tone**: Pick a direction (minimal, editorial, playful, professional) and execute it precisely\n- **Typography**: Use distinctive fonts — avoid Inter, Roboto, Arial\n- **Color**: Commit to a cohesive palette with CSS variables\n- **Avoid**: Purple gradients, centered everything, uniform rounded corners\n\n### 3. Component Structure\n\nFollow this file structure:\n```\nfrontend/src/\n├── components/\n│   └── <ComponentName>/\n│       ├── index.tsx          # Main component\n│       ├── <ComponentName>.test.tsx  # Vitest unit tests\n│       └── <ComponentName>.module.css  # Scoped styles (or Tailwind)\n├── pages/\n│   └── <PageName>.tsx\n```\n\n### 4. Accessibility Requirements (WCAG 2.1 AA — Non-Negotiable)\n\nEvery component MUST:\n```tsx\n// ✅ Semantic HTML\n<button type=\"button\" onClick={handleClick}>\n  <span aria-hidden=\"true\">→</span>\n  <span className=\"sr-only\">Next step</span>\n</button>\n\n// ✅ ARIA labels on interactive elements\n<input\n  id=\"email\"\n  type=\"email\"\n  aria-describedby=\"email-error\"\n  aria-invalid={!!errors.email}\n  aria-required=\"true\"\n/>\n<span id=\"email-error\" role=\"alert\">{errors.email}</span>\n\n// ✅ Focus management\n<dialog aria-modal=\"true\" aria-labelledby=\"dialog-title\">\n  <h2 id=\"dialog-title\">Confirm Action</h2>\n  {/* auto-focus first interactive element */}\n</dialog>\n\n// ✅ Color contrast — 4.5:1 for text, 3:1 for UI components\n// ✅ Keyboard navigable — Tab, Enter, Escape, Arrow keys\n// ✅ No content only via color\n```\n\n### 5. Responsiveness (Required Breakpoints)\n\n```css\n/* Mobile-first in Tailwind */\n<div className=\"\n  w-full px-4           /* 320px — mobile */\n  sm:px-6              /* 640px — large mobile */\n  md:px-8 md:grid md:grid-cols-2  /* 768px — tablet */\n  lg:grid-cols-3       /* 1024px — desktop */\n  xl:max-w-7xl xl:mx-auto  /* 1280px — wide */\n\">\n```\n\n### 6. Component Template\n\n```tsx\nimport { forwardRef, type ComponentPropsWithoutRef } from 'react'\n\ninterface Props extends ComponentPropsWithoutRef<'div'> {\n  label: string\n  variant?: 'primary' | 'secondary'\n}\n\nexport const MyComponent = forwardRef<HTMLDivElement, Props>(\n  ({ label, variant = 'primary', className, ...props }, ref) => {\n    return (\n      <div\n        ref={ref}\n        role=\"region\"\n        aria-label={label}\n        className={/* tailwind classes */}\n        {...props}\n      >\n        {/* content */}\n      </div>\n    )\n  }\n)\n\nMyComponent.displayName = 'MyComponent'\n```\n\n### 7. Motion and Interactions\n\n```tsx\n// CSS transitions preferred for simple animations\n// Use Framer Motion for complex sequences\nimport { motion } from 'framer-motion'\n\n<motion.div\n  initial={{ opacity: 0, y: 20 }}\n  animate={{ opacity: 1, y: 0 }}\n  exit={{ opacity: 0 }}\n  transition={{ duration: 0.2 }}\n>\n```\n\nRespect `prefers-reduced-motion`:\n```css\n@media (prefers-reduced-motion: reduce) {\n  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }\n}\n```\n\n### 8. Unit Test Template (Vitest + Testing Library)\n\n```tsx\nimport { render, screen } from '@testing-library/react'\nimport userEvent from '@testing-library/user-event'\nimport { axe, toHaveNoViolations } from 'jest-axe'\nimport { MyComponent } from './index'\n\nexpect.extend(toHaveNoViolations)\n\ndescribe('MyComponent', () => {\n  it('renders with accessible label', () => {\n    render(<MyComponent label=\"Test\" />)\n    expect(screen.getByRole('region', { name: 'Test' })).toBeInTheDocument()\n  })\n\n  it('is keyboard navigable', async () => {\n    const user = userEvent.setup()\n    render(<MyComponent label=\"Test\" />)\n    await user.tab()\n    expect(document.activeElement).toBeInTheDocument()\n  })\n\n  it('has no axe accessibility violations', async () => {\n    const { container } = render(<MyComponent label=\"Test\" />)\n    const results = await axe(container)\n    expect(results).toHaveNoViolations()\n  })\n})\n```\n\n### 9. Verification Gate\n\nRun these before marking component done:\n```bash\ncd frontend\n\n# TypeScript — zero errors\nnpx tsc --noEmit\n\n# Lint — zero errors\nnpm run lint\n\n# Unit tests — all pass, coverage >= 80%\nnpm run test -- --coverage\n\n# axe accessibility check built into tests\nnpm run test -- --reporter=verbose\n```\n\n**Gate:** All checks must pass. Fix errors before moving to `webapp-testing`.\n\n## Artifacts Produced\n- `frontend/src/components/<ComponentName>/index.tsx`\n- `frontend/src/components/<ComponentName>/<ComponentName>.test.tsx`\n- Screenshot of rendered component (via Playwright if needed)"},{"name":"frontend-design","description":"Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, artifacts, posters, or applications (examples include websites, landing pages, dashboards, React components, HTML/CSS layouts, or when styling/beautifying any web UI). Generates creative, polished code and UI design that avoids generic AI aesthetics.","source":"ai-skills","phase":"3 — Develop","order":4,"body":"This skill guides creation of distinctive, production-grade frontend interfaces that avoid generic \"AI slop\" aesthetics. Implement real working code with exceptional attention to aesthetic details and creative choices.\n\nThe user provides frontend requirements: a component, page, application, or interface to build. They may include context about the purpose, audience, or technical constraints.\n\n## Design Thinking\n\nBefore coding, understand the context and commit to a BOLD aesthetic direction:\n- **Purpose**: What problem does this interface solve? Who uses it?\n- **Tone**: Pick an extreme: brutally minimal, maximalist chaos, retro-futuristic, organic/natural, luxury/refined, playful/toy-like, editorial/magazine, brutalist/raw, art deco/geometric, soft/pastel, industrial/utilitarian, etc. There are so many flavors to choose from. Use these for inspiration but design one that is true to the aesthetic direction.\n- **Constraints**: Technical requirements (framework, performance, accessibility).\n- **Differentiation**: What makes this UNFORGETTABLE? What's the one thing someone will remember?\n\n**CRITICAL**: Choose a clear conceptual direction and execute it with precision. Bold maximalism and refined minimalism both work - the key is intentionality, not intensity.\n\nThen implement working code (HTML/CSS/JS, React, Vue, etc.) that is:\n- Production-grade and functional\n- Visually striking and memorable\n- Cohesive with a clear aesthetic point-of-view\n- Meticulously refined in every detail\n\n## Frontend Aesthetics Guidelines\n\nFocus on:\n- **Typography**: Choose fonts that are beautiful, unique, and interesting. Avoid generic fonts like Arial and Inter; opt instead for distinctive choices that elevate the frontend's aesthetics; unexpected, characterful font choices. Pair a distinctive display font with a refined body font.\n- **Color & Theme**: Commit to a cohesive aesthetic. Use CSS variables for consistency. Dominant colors with sharp accents outperform timid, evenly-distributed palettes.\n- **Motion**: Use animations for effects and micro-interactions. Prioritize CSS-only solutions for HTML. Use Motion library for React when available. Focus on high-impact moments: one well-orchestrated page load with staggered reveals (animation-delay) creates more delight than scattered micro-interactions. Use scroll-triggering and hover states that surprise.\n- **Spatial Composition**: Unexpected layouts. Asymmetry. Overlap. Diagonal flow. Grid-breaking elements. Generous negative space OR controlled density.\n- **Backgrounds & Visual Details**: Create atmosphere and depth rather than defaulting to solid colors. Add contextual effects and textures that match the overall aesthetic. Apply creative forms like gradient meshes, noise textures, geometric patterns, layered transparencies, dramatic shadows, decorative borders, custom cursors, and grain overlays.\n\nNEVER use generic AI-generated aesthetics like overused font families (Inter, Roboto, Arial, system fonts), cliched color schemes (particularly purple gradients on white backgrounds), predictable layouts and component patterns, and cookie-cutter design that lacks context-specific character.\n\nInterpret creatively and make unexpected choices that feel genuinely designed for the context. No design should be the same. Vary between light and dark themes, different fonts, different aesthetics. NEVER converge on common choices (Space Grotesk, for example) across generations.\n\n**IMPORTANT**: Match implementation complexity to the aesthetic vision. Maximalist designs need elaborate code with extensive animations and effects. Minimalist or refined designs need restraint, precision, and careful attention to spacing, typography, and subtle details. Elegance comes from executing the vision well.\n\nRemember: Claude is capable of extraordinary creative work. Don't hold back, show what can truly be created when thinking outside the box and committing fully to a distinctive vision."},{"name":"react-best-practices","description":"React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on tasks involving React components, Next.js pages, data fetching, bundle optimization, or performance improvements.","source":"ai-skills","phase":"3 — Develop","order":5,"body":"# Vercel React Best Practices\n\nComprehensive performance optimization guide for React and Next.js applications, maintained by Vercel. Contains 68 rules across 8 categories, prioritized by impact to guide automated refactoring and code generation.\n\n## When to Apply\n\nReference these guidelines when:\n- Writing new React components or Next.js pages\n- Implementing data fetching (client or server-side)\n- Reviewing code for performance issues\n- Refactoring existing React/Next.js code\n- Optimizing bundle size or load times\n\n## Rule Categories by Priority\n\n| Priority | Category | Impact | Prefix |\n|----------|----------|--------|--------|\n| 1 | Eliminating Waterfalls | CRITICAL | `async-` |\n| 2 | Bundle Size Optimization | CRITICAL | `bundle-` |\n| 3 | Server-Side Performance | HIGH | `server-` |\n| 4 | Client-Side Data Fetching | MEDIUM-HIGH | `client-` |\n| 5 | Re-render Optimization | MEDIUM | `rerender-` |\n| 6 | Rendering Performance | MEDIUM | `rendering-` |\n| 7 | JavaScript Performance | LOW-MEDIUM | `js-` |\n| 8 | Advanced Patterns | LOW | `advanced-` |\n\n## Quick Reference\n\n### 1. Eliminating Waterfalls (CRITICAL)\n- `async-cheap-condition-before-await` - Check cheap sync conditions before awaiting flags or remote values\n- `async-defer-await` - Move await into branches where actually used\n- `async-parallel` - Use Promise.all() for independent operations\n- `async-dependencies` - Use better-all for partial dependencies\n- `async-api-routes` - Start promises early, await late in API routes\n- `async-suspense-boundaries` - Use Suspense to stream content\n\n### 2. Bundle Size Optimization (CRITICAL)\n- `bundle-barrel-imports` - Import directly, avoid barrel files\n- `bundle-dynamic-imports` - Use next/dynamic for heavy components\n- `bundle-defer-third-party` - Load analytics/logging after hydration\n- `bundle-conditional` - Load modules only when feature is activated\n- `bundle-preload` - Preload on hover/focus for perceived speed\n\n### 3. Server-Side Performance (HIGH)\n- `server-auth-actions` - Authenticate server actions like API routes\n- `server-cache-react` - Use React.cache() for per-request deduplication\n- `server-cache-lru` - Use LRU cache for cross-request caching\n- `server-dedup-props` - Avoid duplicate serialization in RSC props\n- `server-hoist-static-io` - Hoist static I/O (fonts, logos) to module level\n- `server-no-shared-module-state` - Avoid module-level mutable request state in RSC/SSR\n- `server-serialization` - Minimize data passed to client components\n- `server-parallel-fetching` - Restructure components to parallelize fetches\n- `server-parallel-nested-fetching` - Chain nested fetches per item in Promise.all\n- `server-after-nonblocking` - Use after() for non-blocking operations\n\n### 4. Client-Side Data Fetching (MEDIUM-HIGH)\n- `client-swr-dedup` - Use SWR for automatic request deduplication\n- `client-event-listeners` - Deduplicate global event listeners\n- `client-passive-event-listeners` - Use passive listeners for scroll\n- `client-localstorage-schema` - Version and minimize localStorage data\n\n### 5. Re-render Optimization (MEDIUM)\n- `rerender-defer-reads` - Don't subscribe to state only used in callbacks\n- `rerender-memo` - Extract expensive work into memoized components\n- `rerender-memo-with-default-value` - Hoist default non-primitive props\n- `rerender-dependencies` - Use primitive dependencies in effects\n- `rerender-derived-state` - Subscribe to derived booleans, not raw values\n- `rerender-derived-state-no-effect` - Derive state during render, not effects\n- `rerender-functional-setstate` - Use functional setState for stable callbacks\n- `rerender-lazy-state-init` - Pass function to useState for expensive values\n- `rerender-simple-expression-in-memo` - Avoid memo for simple primitives\n- `rerender-split-combined-hooks` - Split hooks with independent dependencies\n- `rerender-move-effect-to-event` - Put interaction logic in event handlers\n- `rerender-transitions` - Use startTransition for non-urgent updates\n- `rerender-use-deferred-value` - Defer expensive renders to keep input responsive\n- `rerender-use-ref-transient-values` - Use refs for transient frequent values\n- `rerender-no-inline-components` - Don't define components inside components\n\n### 6. Rendering Performance (MEDIUM)\n- `rendering-animate-svg-wrapper` - Animate div wrapper, not SVG element\n- `rendering-content-visibility` - Use content-visibility for long lists\n- `rendering-hoist-jsx` - Extract static JSX outside components\n- `rendering-svg-precision` - Reduce SVG coordinate precision\n- `rendering-hydration-no-flicker` - Use inline script for client-only data\n- `rendering-hydration-suppress-warning` - Suppress expected mismatches\n- `rendering-activity` - Use Activity component for show/hide\n- `rendering-conditional-render` - Use ternary, not && for conditionals\n- `rendering-usetransition-loading` - Prefer useTransition for loading state\n- `rendering-resource-hints` - Use React DOM resource hints for preloading\n- `rendering-script-defer-async` - Use defer or async on script tags\n\n### 7. JavaScript Performance (LOW-MEDIUM)\n- `js-batch-dom-css` - Group CSS changes via classes or cssText\n- `js-index-maps` - Build Map for repeated lookups\n- `js-cache-property-access` - Cache object properties in loops\n- `js-cache-function-results` - Cache function results in module-level Map\n- `js-cache-storage` - Cache localStorage/sessionStorage reads\n- `js-combine-iterations` - Combine multiple filter/map into one loop\n- `js-length-check-first` - Check array length before expensive comparison\n- `js-early-exit` - Return early from functions\n- `js-hoist-regexp` - Hoist RegExp creation outside loops\n- `js-min-max-loop` - Use loop for min/max instead of sort\n- `js-set-map-lookups` - Use Set/Map for O(1) lookups\n- `js-tosorted-immutable` - Use toSorted() for immutability\n- `js-flatmap-filter` - Use flatMap to map and filter in one pass\n- `js-request-idle-callback` - Defer non-critical work to browser idle time\n\n### 8. Advanced Patterns (LOW)\n- `advanced-event-handler-refs` - Store event handlers in refs\n- `advanced-init-once` - Initialize app once per app load\n- `advanced-use-latest` - useLatest for stable callback refs"},{"name":"api-endpoint","description":"Build a Node.js + Express + TypeScript REST API endpoint with input validation, error handling, PostgreSQL integration, and unit tests. Use when adding or modifying backend API routes.","source":"ai-skills","phase":"3 — Develop","order":6,"body":"# API Endpoint Builder\n\nBuild production-grade Node.js REST endpoints. Always driven by an approved spec.\n\n## Trigger Conditions\n- \"Add API endpoint for X\"\n- \"Create a POST/GET/PUT/DELETE route for X\"\n- \"Build backend logic for X\"\n\n## Prerequisites\n- `specs/<feature-slug>.spec.md` exists and approved\n- `project-scaffold` has been run (backend/ directory exists)\n\n## Architecture Pattern\n\nFollow the **Controller → Service → Repository** layered pattern:\n\n```\nbackend/src/\n├── routes/         # Route definitions (Express Router)\n├── controllers/    # Request/response handling\n├── services/       # Business logic\n├── repositories/   # Database queries (pg)\n├── middleware/     # Auth, validation, error handling\n├── types/          # TypeScript interfaces\n└── __tests__/      # Vitest unit tests\n```\n\n## Step 1: Define Types\n\n```ts\n// backend/src/types/<feature>.ts\nexport interface CreateUserDto {\n  name: string\n  email: string\n  role: 'admin' | 'user'\n}\n\nexport interface User extends CreateUserDto {\n  id: string\n  createdAt: Date\n  updatedAt: Date\n}\n```\n\n## Step 2: Repository (Database Layer)\n\n```ts\n// backend/src/repositories/user.repository.ts\nimport { pool } from '../db'\nimport type { User, CreateUserDto } from '../types/user'\n\nexport const userRepository = {\n  async findById(id: string): Promise<User | null> {\n    const { rows } = await pool.query(\n      'SELECT * FROM users WHERE id = $1',\n      [id]\n    )\n    return rows[0] ?? null\n  },\n\n  async create(dto: CreateUserDto): Promise<User> {\n    const { rows } = await pool.query(\n      `INSERT INTO users (name, email, role)\n       VALUES ($1, $2, $3)\n       RETURNING *`,\n      [dto.name, dto.email, dto.role]\n    )\n    return rows[0]\n  }\n}\n```\n\n## Step 3: Service (Business Logic)\n\n```ts\n// backend/src/services/user.service.ts\nimport { userRepository } from '../repositories/user.repository'\nimport type { CreateUserDto } from '../types/user'\n\nexport const userService = {\n  async getUser(id: string) {\n    const user = await userRepository.findById(id)\n    if (!user) throw Object.assign(new Error('User not found'), { status: 404 })\n    return user\n  },\n\n  async createUser(dto: CreateUserDto) {\n    // Business rules here (e.g., check for duplicate email)\n    return userRepository.create(dto)\n  }\n}\n```\n\n## Step 4: Controller (Request/Response)\n\n```ts\n// backend/src/controllers/user.controller.ts\nimport { RequestHandler } from 'express'\nimport { z } from 'zod'\nimport { userService } from '../services/user.service'\n\nconst createUserSchema = z.object({\n  name: z.string().min(1).max(100),\n  email: z.string().email(),\n  role: z.enum(['admin', 'user'])\n})\n\nexport const getUser: RequestHandler = async (req, res, next) => {\n  try {\n    const user = await userService.getUser(req.params.id)\n    res.json(user)\n  } catch (err) {\n    next(err)\n  }\n}\n\nexport const createUser: RequestHandler = async (req, res, next) => {\n  try {\n    const dto = createUserSchema.parse(req.body)  // Zod validation\n    const user = await userService.createUser(dto)\n    res.status(201).json(user)\n  } catch (err) {\n    next(err)\n  }\n}\n```\n\n## Step 5: Route Registration\n\n```ts\n// backend/src/routes/user.routes.ts\nimport { Router } from 'express'\nimport { getUser, createUser } from '../controllers/user.controller'\nimport { authenticate } from '../middleware/auth'\n\nexport const userRouter = Router()\n\nuserRouter.get('/:id', authenticate, getUser)\nuserRouter.post('/', authenticate, createUser)\n```\n\n## Step 6: Centralized Error Handler\n\n```ts\n// backend/src/middleware/errorHandler.ts\nimport { ErrorRequestHandler } from 'express'\nimport { ZodError } from 'zod'\n\nexport const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {\n  if (err instanceof ZodError) {\n    return res.status(400).json({\n      error: 'Validation failed',\n      details: err.flatten().fieldErrors\n    })\n  }\n\n  const status = (err as any).status ?? 500\n  const message = status < 500 ? err.message : 'Internal server error'\n\n  if (status >= 500) console.error(err)\n\n  res.status(status).json({ error: message })\n}\n```\n\n## Step 7: Unit Tests (Vitest)\n\n```ts\n// backend/src/__tests__/user.service.test.ts\nimport { describe, it, expect, vi, beforeEach } from 'vitest'\nimport { userService } from '../services/user.service'\nimport { userRepository } from '../repositories/user.repository'\n\nvi.mock('../repositories/user.repository')\n\ndescribe('userService.getUser', () => {\n  beforeEach(() => vi.clearAllMocks())\n\n  it('returns user when found', async () => {\n    const mockUser = { id: '1', name: 'Alice', email: 'a@test.com', role: 'user' }\n    vi.mocked(userRepository.findById).mockResolvedValue(mockUser as any)\n\n    const result = await userService.getUser('1')\n    expect(result).toEqual(mockUser)\n  })\n\n  it('throws 404 when user not found', async () => {\n    vi.mocked(userRepository.findById).mockResolvedValue(null)\n\n    await expect(userService.getUser('999')).rejects.toMatchObject({ status: 404 })\n  })\n})\n```\n\n## Verification Gate\n\n```bash\ncd backend\n\n# TypeScript — zero errors\nnpx tsc --noEmit && echo \"TS: OK\"\n\n# Lint\nnpm run lint && echo \"LINT: OK\"\n\n# Unit tests with coverage\nnpm run test -- --coverage && echo \"TESTS: OK\"\n\n# Manual smoke test (server must be running)\ncurl -s http://localhost:3001/health | jq .\n```\n\n**Gate:** All pass before `requesting-code-review`.\n\n## Security Checklist\n- [ ] Input validated with Zod at controller layer\n- [ ] No raw SQL string interpolation — use parameterized queries (`$1`, `$2`)\n- [ ] Auth middleware applied to protected routes\n- [ ] Errors sanitized — no stack traces exposed in production responses\n- [ ] Rate limiting applied (use `express-rate-limit` on public endpoints)"},{"name":"db-migrate","description":"Create and run PostgreSQL schema migrations for Node.js projects. Use when adding tables, columns, indexes, or constraints. Uses node-pg-migrate. Always spec-driven — check spec before creating any migration.","source":"ai-skills","phase":"3 — Develop","order":7,"body":"# Database Migration\n\nManage PostgreSQL schema changes safely with `node-pg-migrate`. Every migration is versioned, reversible, and reviewed before merging.\n\n## Trigger Conditions\n- \"Add table for X\"\n- \"Add column X to table Y\"\n- \"Create index on X\"\n- \"Modify schema for X feature\"\n\n## Prerequisites\n- `specs/<feature-slug>.spec.md` — check the Database section\n- PostgreSQL running (`docker-compose up db` or Railway DB provisioned)\n- `DATABASE_URL` set in `.env`\n\n## Setup (First Time)\n\n```bash\ncd backend\nnpm install node-pg-migrate pg\n```\n\n**`package.json` scripts:**\n```json\n{\n  \"scripts\": {\n    \"migrate:up\": \"node-pg-migrate up\",\n    \"migrate:down\": \"node-pg-migrate down\",\n    \"migrate:create\": \"node-pg-migrate create\",\n    \"migrate:status\": \"node-pg-migrate status\"\n  }\n}\n```\n\n**`database.json`** (node-pg-migrate config):\n```json\n{\n  \"dev\": {\n    \"url\": { \"ENV\": \"DATABASE_URL\" }\n  }\n}\n```\n\n## Step 1: Create Migration File\n\n```bash\ncd backend\nnpm run migrate:create -- add_users_table\n# Creates: migrations/1712000000000_add_users_table.js\n```\n\n## Step 2: Write Migration\n\n```js\n// migrations/1712000000000_add_users_table.js\n/** @type {import('node-pg-migrate').MigrationBuilder} */\nexports.up = (pgm) => {\n  // Enable UUID extension\n  pgm.createExtension('pgcrypto', { ifNotExists: true })\n\n  pgm.createTable('users', {\n    id: {\n      type: 'uuid',\n      primaryKey: true,\n      default: pgm.func('gen_random_uuid()')\n    },\n    name: {\n      type: 'varchar(100)',\n      notNull: true\n    },\n    email: {\n      type: 'varchar(255)',\n      notNull: true,\n      unique: true\n    },\n    role: {\n      type: 'varchar(20)',\n      notNull: true,\n      default: \"'user'\",\n      check: \"role IN ('admin', 'user')\"\n    },\n    created_at: {\n      type: 'timestamptz',\n      notNull: true,\n      default: pgm.func('NOW()')\n    },\n    updated_at: {\n      type: 'timestamptz',\n      notNull: true,\n      default: pgm.func('NOW()')\n    }\n  })\n\n  // Index for email lookups\n  pgm.createIndex('users', 'email')\n\n  // Auto-update updated_at trigger\n  pgm.sql(`\n    CREATE OR REPLACE FUNCTION update_updated_at()\n    RETURNS TRIGGER AS $$\n    BEGIN NEW.updated_at = NOW(); RETURN NEW; END;\n    $$ LANGUAGE plpgsql;\n  `)\n  pgm.sql(`\n    CREATE TRIGGER users_updated_at\n    BEFORE UPDATE ON users\n    FOR EACH ROW EXECUTE FUNCTION update_updated_at();\n  `)\n}\n\nexports.down = (pgm) => {\n  pgm.sql('DROP TRIGGER IF EXISTS users_updated_at ON users')\n  pgm.sql('DROP FUNCTION IF EXISTS update_updated_at')\n  pgm.dropTable('users')\n}\n```\n\n## Step 3: Run Migration\n\n```bash\ncd backend\n\n# Apply migration\nDATABASE_URL=postgres://appuser:apppassword@localhost:5432/appdb \\\n  npm run migrate:up\n\n# Verify\npsql $DATABASE_URL -c \"\\dt\"\npsql $DATABASE_URL -c \"\\d users\"\n```\n\n## Step 4: Common Migration Patterns\n\n**Add column (non-breaking):**\n```js\nexports.up = (pgm) => {\n  pgm.addColumn('users', {\n    avatar_url: { type: 'text', notNull: false }  // nullable = safe\n  })\n}\nexports.down = (pgm) => pgm.dropColumn('users', 'avatar_url')\n```\n\n**Add index:**\n```js\nexports.up = (pgm) => {\n  pgm.createIndex('orders', ['user_id', 'created_at'], { name: 'idx_orders_user_date' })\n}\nexports.down = (pgm) => pgm.dropIndex('orders', [], { name: 'idx_orders_user_date' })\n```\n\n**Rename column (multi-step, safe):**\n```js\n// Migration 1: Add new column\nexports.up = (pgm) => pgm.addColumn('users', { full_name: { type: 'varchar(100)' } })\n// Migration 2: Backfill data\n// Migration 3: Drop old column\n```\n\n## Step 5: Migration Safety Rules\n\n- **Never** edit a migration that has already been run in production\n- **Always** write a `down` function — rollback must work\n- **Test rollback** locally before merging: `npm run migrate:down && npm run migrate:up`\n- **Use transactions** for DDL — node-pg-migrate wraps in transactions by default\n- **Nullable first** for new columns on existing tables (avoid locking large tables)\n- **No app code changes** in the same PR as a destructive migration\n\n## Verification Gate\n\n```bash\n# Migration runs cleanly\nnpm run migrate:up && echo \"MIGRATE UP: OK\"\n\n# Rollback works\nnpm run migrate:down && echo \"MIGRATE DOWN: OK\"\n\n# Re-apply\nnpm run migrate:up && echo \"RE-APPLY: OK\"\n\n# Schema matches spec\npsql $DATABASE_URL -c \"\\d <table_name>\"\n```\n\n**Gate:** All 3 steps (up, down, up) must succeed before continuing."},{"name":"coding-guidelines","description":"Reference coding standards for this stack (React+Vite+TypeScript, Node.js, PostgreSQL). Use when writing any code to ensure consistency. Also use when reviewing code for style compliance. Not a step in the flow — a reference all other skills consult.","source":"ai-skills","phase":"Reference","order":8,"body":"# Coding Guidelines\n\nStandards for the full-stack: React+Vite+TypeScript frontend, Node.js+Express backend, PostgreSQL database.\n\n## General Principles\n\n1. **Spec first** — No code without `specs/<feature>.spec.md`\n2. **TypeScript strict** — `strict: true` in all `tsconfig.json` files. No `any`.\n3. **Small functions** — max 30 lines. If longer, split.\n4. **Explicit over implicit** — No magic. Name things clearly.\n5. **Fail fast** — Validate at boundaries. Trust internals.\n6. **No premature abstraction** — Three similar uses before extracting a helper.\n\n---\n\n## Frontend (React + Vite + TypeScript)\n\n### File & Folder Naming\n```\nfrontend/src/\n├── components/          # PascalCase folders, index.tsx inside\n│   └── UserCard/\n│       ├── index.tsx\n│       ├── UserCard.test.tsx\n│       └── UserCard.module.css\n├── pages/               # PascalCase, route-level components\n├── hooks/               # camelCase, prefix with \"use\"\n├── utils/               # camelCase, pure functions\n├── types/               # PascalCase interfaces/types\n├── api/                 # camelCase, API client functions\n└── store/               # state management\n```\n\n### TypeScript\n```ts\n// ✅ Explicit return types on exported functions\nexport function formatDate(date: Date): string { ... }\n\n// ✅ Prefer interfaces for object shapes\ninterface UserCardProps {\n  userId: string\n  onEdit?: (id: string) => void\n}\n\n// ✅ Use discriminated unions over boolean flags\ntype RequestState =\n  | { status: 'idle' }\n  | { status: 'loading' }\n  | { status: 'success'; data: User }\n  | { status: 'error'; error: string }\n\n// ❌ Never use any\nconst data: any = ...   // FORBIDDEN\n```\n\n### React Components\n```tsx\n// ✅ Named exports only (no default exports for components)\nexport function UserCard({ userId, onEdit }: UserCardProps) { ... }\n\n// ✅ One component per file\n// ✅ Props destructured in signature\n// ✅ forwardRef when component wraps a DOM element\n// ❌ No inline components (breaks Fast Refresh + causes re-render bugs)\nfunction Parent() {\n  const Inner = () => <div />   // FORBIDDEN\n}\n```\n\n### Hooks\n```ts\n// ✅ Single responsibility\nexport function useUserData(userId: string) {\n  // Only fetching/caching logic here\n}\n\n// ✅ Return named object, not array (unless following React convention)\nreturn { user, isLoading, error, refetch }\n\n// ✅ Cleanup side effects\nuseEffect(() => {\n  const sub = subscribe()\n  return () => sub.unsubscribe()  // always return cleanup\n}, [])\n```\n\n### Styling\n```tsx\n// ✅ Tailwind utility classes — mobile-first\n// ✅ CSS modules for complex, component-specific styles\n// ✅ CSS variables for theme tokens\n// ❌ No inline styles (except dynamic values)\n// ❌ No !important\n```\n\n### Accessibility (WCAG 2.1 AA — Mandatory)\n```tsx\n// ✅ Semantic HTML always\n<button>, <nav>, <main>, <section aria-label=\"...\">\n\n// ✅ Every image has alt\n<img src={src} alt={description} />   // or alt=\"\" for decorative\n\n// ✅ Focus visible — never remove outline without replacing\n:focus-visible { outline: 2px solid var(--color-focus); }\n\n// ✅ Color contrast: 4.5:1 for text, 3:1 for UI\n// ✅ Keyboard navigable — Tab, Enter, Escape, Arrows\n// ✅ ARIA only when semantics are insufficient\n```\n\n---\n\n## Backend (Node.js + Express + TypeScript)\n\n### File Naming\n```\nbackend/src/\n├── routes/        # <resource>.routes.ts\n├── controllers/   # <resource>.controller.ts\n├── services/      # <resource>.service.ts\n├── repositories/  # <resource>.repository.ts\n├── middleware/    # <name>.middleware.ts\n├── types/         # <name>.types.ts\n└── __tests__/     # <name>.test.ts\n```\n\n### API Design\n```\nGET    /api/v1/users          # List (paginated)\nGET    /api/v1/users/:id      # Get one\nPOST   /api/v1/users          # Create\nPUT    /api/v1/users/:id      # Replace\nPATCH  /api/v1/users/:id      # Partial update\nDELETE /api/v1/users/:id      # Delete\n```\n\n```ts\n// ✅ Always version APIs: /api/v1/...\n// ✅ Return consistent shapes\n{ data: T }                         // success\n{ error: string, details?: unknown } // error\n\n// ✅ Use HTTP status codes correctly\n200 OK, 201 Created, 204 No Content\n400 Bad Request, 401 Unauthorized, 403 Forbidden\n404 Not Found, 409 Conflict, 422 Unprocessable Entity\n500 Internal Server Error\n```\n\n### Security\n```ts\n// ✅ Validate ALL input with Zod at controller layer\nconst schema = z.object({ email: z.string().email() })\nconst dto = schema.parse(req.body)\n\n// ✅ Parameterized queries — NEVER string interpolation\npool.query('SELECT * FROM users WHERE id = $1', [id])\n\n// ✅ Sanitize error messages — no stack traces to clients\n// ✅ Rate limit public endpoints\n// ✅ helmet() on all Express apps\n// ✅ CORS whitelist — no wildcard in production\n```\n\n### Error Handling\n```ts\n// ✅ Throw errors with status codes from services\nthrow Object.assign(new Error('Not found'), { status: 404 })\n\n// ✅ All controllers pass errors to next()\ntry { ... } catch (err) { next(err) }\n\n// ✅ One centralized error handler at app level\n```\n\n---\n\n## Database (PostgreSQL)\n\n### Schema Conventions\n```sql\n-- Table names: snake_case, plural\n-- Column names: snake_case\n-- Primary keys: UUID (gen_random_uuid())\n-- Always: created_at, updated_at (timestamptz)\n-- Foreign keys: <table_singular>_id\n\nCREATE TABLE user_profiles (\n  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  user_id     UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,\n  bio         TEXT,\n  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),\n  updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()\n);\n```\n\n### Query Rules\n```ts\n// ✅ Parameterized queries only\n// ✅ Select only needed columns (never SELECT *)\n// ✅ Index foreign keys and frequently-queried columns\n// ✅ Use LIMIT on all list queries\n// ✅ Wrap multi-step operations in transactions\n```\n\n### Migrations\n```\n// ✅ Every change via migration file\n// ✅ Always write down() function\n// ✅ Test up + down + up before merging\n// ✅ Never edit a run migration — always new file\n```\n\n---\n\n## Git & Commits\n\n```\n# Commit message format (Conventional Commits)\nfeat: add user profile component\nfix: correct email validation in registration\nchore: update dependencies\ntest: add E2E tests for checkout flow\ndocs: update API README\n\n# Branch naming\nfeature/<ticket-id>-short-description\nfix/<ticket-id>-short-description\n\n# PRs\n- Linked to spec file\n- All CI checks green\n- Code review done (requesting-code-review skill)\n```\n\n---\n\n## Definition of Done (Per Feature)\n\n- [ ] Spec written and approved\n- [ ] TypeScript: 0 errors\n- [ ] ESLint: 0 errors\n- [ ] Unit test coverage ≥ 80%\n- [ ] Playwright E2E: all pass\n- [ ] axe-core: 0 violations\n- [ ] Docker build: succeeds\n- [ ] Deployed to Railway: health check passes\n- [ ] Code review: no Critical/Important issues open"},{"name":"requesting-code-review","description":"Use when completing tasks, implementing major features, or before merging to verify work meets requirements. Dispatches a focused code-reviewer subagent with precise context. Use after every major SDLC phase.","source":"ai-skills","phase":"4 — Review","order":9,"body":"# Requesting Code Review\n\nDispatch a code-reviewer subagent to catch issues before they cascade. The reviewer gets precisely crafted context for evaluation — never your session's history. This keeps the reviewer focused on the work product, not your thought process, and preserves your own context for continued work.\n\n**Core principle:** Review early, review often.\n\n## When to Request Review\n\n**Mandatory:**\n- After each task in subagent-driven development\n- After completing major feature\n- Before merge to main\n\n**Optional but valuable:**\n- When stuck (fresh perspective)\n- Before refactoring (baseline check)\n- After fixing complex bug\n\n## How to Request\n\n**1. Get git SHAs:**\n```bash\nBASE_SHA=$(git rev-parse HEAD~1)  # or origin/main\nHEAD_SHA=$(git rev-parse HEAD)\n```\n\n**2. Dispatch code-reviewer subagent:**\n\nUse Task tool with the following context filled in:\n\n```\nWHAT_WAS_IMPLEMENTED: [what you just built]\nPLAN_OR_REQUIREMENTS: specs/<feature-slug>.spec.md\nBASE_SHA: [starting commit]\nHEAD_SHA: [ending commit]\nDESCRIPTION: [brief summary of changes]\n```\n\n**3. Act on feedback:**\n- Fix Critical issues immediately\n- Fix Important issues before proceeding\n- Note Minor issues for later\n- Push back if reviewer is wrong (with reasoning)\n\n## Example\n\n```\n[Just completed Task 2: Add React component for user profile]\n\nBASE_SHA=$(git log --oneline | grep \"Task 1\" | head -1 | awk '{print $1}')\nHEAD_SHA=$(git rev-parse HEAD)\n\n[Dispatch code-reviewer subagent]\n  WHAT_WAS_IMPLEMENTED: UserProfile React component with a11y\n  PLAN_OR_REQUIREMENTS: specs/user-profile.spec.md\n  BASE_SHA: a7981ec\n  HEAD_SHA: 3df7661\n  DESCRIPTION: Added UserProfile with WCAG 2.1 AA compliance, Vitest tests\n\n[Subagent returns]:\n  Strengths: Proper ARIA labels, keyboard nav works\n  Issues:\n    Important: Missing focus trap in modal\n    Minor: Color contrast ratio is 4.2:1 (needs 4.5:1)\n  Assessment: Fix before proceeding\n\n[Fix issues → re-run tests → continue]\n```\n\n## Integration with SDLC (ai-skills)\n\n**Mandatory review checkpoints:**\n1. After `react-component` or `api-endpoint`\n2. After `db-migrate`\n3. After `webapp-testing` (E2E) passes\n4. Before `docker-build`\n\n## Red Flags\n\n**Never:**\n- Skip review because \"it's simple\"\n- Ignore Critical issues\n- Proceed with unfixed Important issues\n- Argue with valid technical feedback\n\n**If reviewer is wrong:**\n- Push back with technical reasoning\n- Show code/tests that prove it works\n- Request clarification"},{"name":"webapp-testing","description":"Toolkit for interacting with and testing local web applications using Playwright. Supports verifying frontend functionality, debugging UI behavior, capturing browser screenshots, and viewing browser logs.","source":"ai-skills","phase":"4 — Test","order":10,"body":"# Web Application Testing\n\nTo test local web applications, write native Python Playwright scripts.\n\n**Helper Scripts Available**:\n- `scripts/with_server.py` - Manages server lifecycle (supports multiple servers)\n\n**Always run scripts with `--help` first** to see usage. DO NOT read the source until you try running the script first and find that a customized solution is absolutely necessary. These scripts can be very large and thus pollute your context window. They exist to be called directly as black-box scripts rather than ingested into your context window.\n\n## Decision Tree: Choosing Your Approach\n\n```\nUser task → Is it static HTML?\n    ├─ Yes → Read HTML file directly to identify selectors\n    │         ├─ Success → Write Playwright script using selectors\n    │         └─ Fails/Incomplete → Treat as dynamic (below)\n    │\n    └─ No (dynamic webapp) → Is the server already running?\n        ├─ No → Run: python scripts/with_server.py --help\n        │        Then use the helper + write simplified Playwright script\n        │\n        └─ Yes → Reconnaissance-then-action:\n            1. Navigate and wait for networkidle\n            2. Take screenshot or inspect DOM\n            3. Identify selectors from rendered state\n            4. Execute actions with discovered selectors\n```\n\n## Example: Using with_server.py\n\nTo start a server, run `--help` first, then use the helper:\n\n**Single server:**\n```bash\npython scripts/with_server.py --server \"npm run dev\" --port 5173 -- python your_automation.py\n```\n\n**Multiple servers (e.g., backend + frontend):**\n```bash\npython scripts/with_server.py \\\n  --server \"cd backend && python server.py\" --port 3000 \\\n  --server \"cd frontend && npm run dev\" --port 5173 \\\n  -- python your_automation.py\n```\n\nTo create an automation script, include only Playwright logic (servers are managed automatically):\n```python\nfrom playwright.sync_api import sync_playwright\n\nwith sync_playwright() as p:\n    browser = p.chromium.launch(headless=True) # Always launch chromium in headless mode\n    page = browser.new_page()\n    page.goto('http://localhost:5173') # Server already running and ready\n    page.wait_for_load_state('networkidle') # CRITICAL: Wait for JS to execute\n    # ... your automation logic\n    browser.close()\n```\n\n## Reconnaissance-Then-Action Pattern\n\n1. **Inspect rendered DOM**:\n   ```python\n   page.screenshot(path='/tmp/inspect.png', full_page=True)\n   content = page.content()\n   page.locator('button').all()\n   ```\n\n2. **Identify selectors** from inspection results\n\n3. **Execute actions** using discovered selectors\n\n## Common Pitfall\n\n❌ **Don't** inspect the DOM before waiting for `networkidle` on dynamic apps\n✅ **Do** wait for `page.wait_for_load_state('networkidle')` before inspection\n\n## Best Practices\n\n- **Use bundled scripts as black boxes** - run `--help` first, invoke directly\n- Use `sync_playwright()` for synchronous scripts\n- Always close the browser when done\n- Use descriptive selectors: `text=`, `role=`, CSS selectors, or IDs\n- Add appropriate waits: `page.wait_for_selector()` or `page.wait_for_timeout()`\n\n## SDLC Integration (ai-skills)\n\nRun this skill after `react-component` or `api-endpoint` skills complete.\n\n**Vite + Node.js stack command:**\n```bash\npython scripts/with_server.py \\\n  --server \"cd backend && npm run dev\" --port 3001 \\\n  --server \"cd frontend && npm run dev\" --port 5173 \\\n  -- python e2e/your_test.py\n```\n\n**Verification Gate:** All Playwright tests must pass before running `code-quality-report` or `docker-build` skills."},{"name":"web-design-guidelines","description":"Review UI code for Web Interface Guidelines compliance. Use when asked to \"review my UI\", \"check accessibility\", \"audit design\", \"review UX\", or \"check my site against best practices\". Covers WCAG 2.1 AA, performance, and UX rules.","source":"ai-skills","phase":"4 — Test","order":11,"body":"# Web Interface Guidelines\n\nReview files for compliance with Web Interface Guidelines.\n\n## How It Works\n\n1. Fetch the latest guidelines from the source URL below\n2. Read the specified files (or prompt user for files/pattern)\n3. Check against all rules in the fetched guidelines\n4. Output findings in the terse `file:line` format\n\n## Guidelines Source\n\nFetch fresh guidelines before each review:\n\n```\nhttps://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md\n```\n\nUse WebFetch to retrieve the latest rules. The fetched content contains all the rules and output format instructions.\n\n## Usage\n\nWhen a user provides a file or pattern argument:\n1. Fetch guidelines from the source URL above\n2. Read the specified files\n3. Apply all rules from the fetched guidelines\n4. Output findings using the format specified in the guidelines\n\nIf no files specified, ask the user which files to review.\n\n## SDLC Integration (ai-skills)\n\nRun this skill after `react-component` completes and before `webapp-testing`.\n\n**Quick audit command for this stack:**\n```bash\n# Run on all React components\nnpx eslint \"frontend/src/**/*.{ts,tsx}\" --format=compact\n\n# Check axe violations via built-in tests\ncd frontend && npm run test -- --reporter=verbose 2>&1 | grep -E \"(PASS|FAIL|axe)\"\n```\n\n**Gate:** Zero WCAG 2.1 AA violations required before `docker-build`."},{"name":"code-quality-report","description":"Generate a comprehensive code quality report covering ESLint, TypeScript strict checks, Vitest coverage, and bundle size. Use before docker-build to gate quality. Produces a machine-readable report artifact.","source":"ai-skills","phase":"5 — Quality","order":12,"body":"# Code Quality Report\n\nRun all quality checks and produce a consolidated report before building Docker images.\n\n## Trigger Conditions\n- \"Run quality checks\"\n- \"Generate code quality report\"\n- \"Check code before deploy\"\n- Automatically: before every `docker-build`\n\n## Prerequisites\n- All unit tests passing (`unit-test` skill complete)\n- All E2E tests passing (`webapp-testing` skill complete)\n\n## Step 1: Frontend Quality Checks\n\n```bash\ncd frontend\n\necho \"=== FRONTEND QUALITY REPORT ===\" > /tmp/quality-report.md\necho \"Generated: $(date)\" >> /tmp/quality-report.md\necho \"\" >> /tmp/quality-report.md\n\n# 1. TypeScript strict\necho \"### TypeScript\" >> /tmp/quality-report.md\nnpx tsc --noEmit 2>&1 | tee -a /tmp/quality-report.md\necho \"\" >> /tmp/quality-report.md\n\n# 2. ESLint\necho \"### ESLint\" >> /tmp/quality-report.md\nnpm run lint -- --format=compact 2>&1 | tee -a /tmp/quality-report.md\necho \"\" >> /tmp/quality-report.md\n\n# 3. Vitest coverage\necho \"### Test Coverage\" >> /tmp/quality-report.md\nnpm run test -- --coverage --reporter=verbose 2>&1 | tee -a /tmp/quality-report.md\necho \"\" >> /tmp/quality-report.md\n\n# 4. Bundle size analysis\necho \"### Bundle Size\" >> /tmp/quality-report.md\nnpm run build 2>&1 | tee -a /tmp/quality-report.md\ndu -sh dist/ >> /tmp/quality-report.md\necho \"\" >> /tmp/quality-report.md\n```\n\n## Step 2: Backend Quality Checks\n\n```bash\ncd ../backend\n\necho \"=== BACKEND QUALITY REPORT ===\" >> /tmp/quality-report.md\n\n# 1. TypeScript\necho \"### TypeScript\" >> /tmp/quality-report.md\nnpx tsc --noEmit 2>&1 | tee -a /tmp/quality-report.md\n\n# 2. ESLint\necho \"### ESLint\" >> /tmp/quality-report.md\nnpm run lint -- --format=compact 2>&1 | tee -a /tmp/quality-report.md\n\n# 3. Vitest coverage\necho \"### Test Coverage\" >> /tmp/quality-report.md\nnpm run test -- --coverage 2>&1 | tee -a /tmp/quality-report.md\n```\n\n## Step 3: Accessibility Report\n\n```bash\necho \"=== ACCESSIBILITY REPORT ===\" >> /tmp/quality-report.md\necho \"Run axe-core tests:\" >> /tmp/quality-report.md\ncd frontend\nnpm run test -- --grep=\"axe\" --reporter=verbose 2>&1 | tee -a /tmp/quality-report.md\n```\n\n## Step 4: Quality Gates (Hard Stops)\n\nParse the report and enforce these thresholds:\n\n| Check | Threshold | Hard Stop? |\n|-------|-----------|------------|\n| TypeScript errors | 0 | YES |\n| ESLint errors | 0 | YES |\n| ESLint warnings | 0 (ideally) | warn only |\n| Line coverage | >= 80% | YES |\n| Branch coverage | >= 80% | YES |\n| axe violations | 0 | YES |\n| Bundle size (frontend) | < 500KB gzip | warn |\n\n```bash\n# Fail if any TS errors\nnpx tsc --noEmit && echo \"TS_GATE=PASS\" || { echo \"TS_GATE=FAIL\"; exit 1; }\n\n# Fail if any ESLint errors\nnpm run lint && echo \"LINT_GATE=PASS\" || { echo \"LINT_GATE=FAIL\"; exit 1; }\n\n# Fail if coverage below 80%\nnpm run test -- --coverage --reporter=json > coverage.json\nnode -e \"\n  const cov = require('./coverage/coverage-summary.json')\n  const lines = cov.total.lines.pct\n  if (lines < 80) { console.error('Coverage ' + lines + '% < 80%'); process.exit(1) }\n  console.log('COVERAGE_GATE=PASS (' + lines + '%)')\n\"\n```\n\n## Step 5: Produce Report Artifact\n\n```bash\n# Save timestamped report\nmkdir -p reports\ncp /tmp/quality-report.md \"reports/quality-$(date +%Y%m%d-%H%M%S).md\"\n\necho \"\"\necho \"Quality report saved to: reports/quality-*.md\"\necho \"\"\necho \"=== GATE SUMMARY ===\"\necho \"TypeScript:  PASS/FAIL\"\necho \"ESLint:      PASS/FAIL\"\necho \"Coverage:    PASS/FAIL (XX%)\"\necho \"Axe a11y:    PASS/FAIL\"\necho \"\"\necho \"Next: run docker-build skill\"\n```\n\n## What Blocks Deploy\n\n**Do not proceed to `docker-build` if any of these fail:**\n1. TypeScript errors (any number)\n2. ESLint errors (warnings allowed)\n3. Test coverage below 80% on any file\n4. axe-core violations > 0\n5. Vitest tests failing\n\n## Artifacts Produced\n- `reports/quality-<timestamp>.md` — full quality report\n- `frontend/coverage/` — HTML coverage report\n- `backend/coverage/` — HTML coverage report"},{"name":"docker-build","description":"Build production Docker images for React+Vite frontend and Node.js backend using multi-stage builds. Validates images locally before pushing. Use after code-quality-report passes.","source":"ai-skills","phase":"6 — Build","order":13,"body":"# Docker Build\n\nBuild lean, production-ready Docker images. Multi-stage builds only — no dev dependencies in production images.\n\n## Trigger Conditions\n- \"Build Docker image\"\n- \"Containerize the app\"\n- Automatically: after `code-quality-report` all gates pass\n\n## Prerequisites\n- `code-quality-report` all gates green\n- Docker daemon running: `docker info`\n\n## Frontend Dockerfile\n\n```dockerfile\n# frontend/Dockerfile\n\n# ---- Build Stage ----\nFROM node:20-alpine AS builder\nWORKDIR /app\n\nCOPY package*.json ./\nRUN npm ci --frozen-lockfile\n\nCOPY . .\nRUN npm run build          # Outputs to /app/dist\n\n# ---- Production Stage ----\nFROM nginx:alpine AS production\n\n# Security: non-root user\nRUN addgroup -S appgroup && adduser -S appuser -G appgroup\n\n# Copy built assets\nCOPY --from=builder /app/dist /usr/share/nginx/html\n\n# Nginx config for SPA routing\nCOPY nginx.conf /etc/nginx/conf.d/default.conf\n\n# Fix permissions\nRUN chown -R appuser:appgroup /usr/share/nginx/html \\\n    && chmod -R 755 /usr/share/nginx/html\n\nEXPOSE 8080\nCMD [\"nginx\", \"-g\", \"daemon off;\"]\n```\n\n**`frontend/nginx.conf`:**\n```nginx\nserver {\n    listen 8080;\n    server_name _;\n    root /usr/share/nginx/html;\n    index index.html;\n\n    # Security headers\n    add_header X-Frame-Options \"SAMEORIGIN\";\n    add_header X-Content-Type-Options \"nosniff\";\n    add_header Referrer-Policy \"strict-origin-when-cross-origin\";\n\n    # Gzip\n    gzip on;\n    gzip_types text/plain text/css application/json application/javascript;\n\n    # Cache static assets\n    location ~* \\.(js|css|png|jpg|ico|svg)$ {\n        expires 1y;\n        add_header Cache-Control \"public, immutable\";\n    }\n\n    # SPA fallback\n    location / {\n        try_files $uri $uri/ /index.html;\n    }\n}\n```\n\n## Backend Dockerfile\n\n```dockerfile\n# backend/Dockerfile\n\n# ---- Build Stage ----\nFROM node:20-alpine AS builder\nWORKDIR /app\n\nCOPY package*.json ./\nRUN npm ci --frozen-lockfile\n\nCOPY . .\nRUN npm run build          # tsc → dist/\n\n# ---- Production Stage ----\nFROM node:20-alpine AS production\nWORKDIR /app\n\nENV NODE_ENV=production\n\n# Security: non-root user\nRUN addgroup -S appgroup && adduser -S appuser -G appgroup\n\nCOPY package*.json ./\nRUN npm ci --frozen-lockfile --omit=dev   # prod deps only\n\nCOPY --from=builder /app/dist ./dist\n\nRUN chown -R appuser:appgroup /app\nUSER appuser\n\nEXPOSE 3001\nHEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \\\n  CMD wget -qO- http://localhost:3001/health || exit 1\n\nCMD [\"node\", \"dist/index.js\"]\n```\n\n## Build & Verify\n\n```bash\n# Build images\ndocker build -t myapp-frontend:latest ./frontend\ndocker build -t myapp-backend:latest ./backend\n\n# Check image sizes (should be small)\ndocker images | grep myapp\n\n# Run locally and verify\ndocker compose -f docker-compose.prod.yml up -d\nsleep 5\n\n# Health checks\ncurl -s http://localhost:8080 | grep -q \"<!DOCTYPE html>\" && echo \"FRONTEND: OK\"\ncurl -s http://localhost:3001/health | grep -q \"ok\" && echo \"BACKEND: OK\"\n\ndocker compose -f docker-compose.prod.yml down\n```\n\n## `docker-compose.prod.yml` (local production test)\n\n```yaml\nversion: '3.9'\nservices:\n  db:\n    image: postgres:16-alpine\n    environment:\n      POSTGRES_DB: appdb\n      POSTGRES_USER: appuser\n      POSTGRES_PASSWORD: apppassword\n    healthcheck:\n      test: [\"CMD-SHELL\", \"pg_isready -U appuser\"]\n      interval: 10s\n      timeout: 5s\n      retries: 5\n\n  backend:\n    image: myapp-backend:latest\n    environment:\n      DATABASE_URL: postgres://appuser:apppassword@db:5432/appdb\n      NODE_ENV: production\n      PORT: 3001\n    ports:\n      - \"3001:3001\"\n    depends_on:\n      db:\n        condition: service_healthy\n\n  frontend:\n    image: myapp-frontend:latest\n    ports:\n      - \"8080:8080\"\n    depends_on:\n      - backend\n```\n\n## Verification Gate\n\n```bash\n# Images must exist\ndocker image inspect myapp-frontend:latest > /dev/null && echo \"FRONTEND IMAGE: OK\"\ndocker image inspect myapp-backend:latest > /dev/null && echo \"BACKEND IMAGE: OK\"\n\n# Images must be reasonably sized\nFRONTEND_SIZE=$(docker image inspect myapp-frontend:latest --format='{{.Size}}')\nBACKEND_SIZE=$(docker image inspect myapp-backend:latest --format='{{.Size}}')\necho \"Frontend image size: $((FRONTEND_SIZE / 1024 / 1024))MB\"\necho \"Backend image size: $((BACKEND_SIZE / 1024 / 1024))MB\"\n\n# No CRITICAL vulnerabilities (if trivy available)\nwhich trivy && trivy image myapp-backend:latest --severity CRITICAL\n```\n\n**Gate:** Both health checks must return 200 OK before `deploy-railway`.\n\n## Artifacts Produced\n- `myapp-frontend:latest` Docker image\n- `myapp-backend:latest` Docker image\n- `docker-compose.prod.yml` for local prod testing"},{"name":"deploy-railway","description":"Deploy the React+Vite frontend and Node.js backend to Railway.com via Docker. Provisions PostgreSQL, runs migrations, and verifies the live deployment. Use after docker-build succeeds.","source":"ai-skills","phase":"7 — Deploy","order":14,"body":"# Deploy to Railway\n\nDeploy production Docker images to Railway.com. Includes database provisioning, migration, and post-deploy health verification.\n\n## Trigger Conditions\n- \"Deploy to Railway\"\n- \"Push to production\"\n- Automatically: after `docker-build` gate passes\n\n## Prerequisites\n- `docker-build` completed — both images verified locally\n- Railway account exists and `RAILWAY_TOKEN` set in `.env`\n- Railway CLI installed: `npm install -g @railway/cli`\n\n## Step 1: Login & Project Setup\n\n```bash\n# Login (opens browser)\nrailway login\n\n# Link to existing project or create new\nrailway link         # existing project\n# OR\nrailway init         # new project → follow prompts, note PROJECT_ID\n```\n\n## Step 2: Provision PostgreSQL on Railway\n\n```bash\n# Add PostgreSQL plugin to your Railway project\nrailway add --plugin postgresql\n\n# Verify DATABASE_URL is set in Railway environment\nrailway variables | grep DATABASE_URL\n```\n\n## Step 3: Configure Railway Services\n\nRailway reads `railway.toml` from project root:\n\n```toml\n# railway.toml\n[build]\nbuilder = \"DOCKERFILE\"\n\n[[services]]\nname = \"backend\"\nsource = \"backend\"\ndockerfile = \"backend/Dockerfile\"\n\n[services.backend.variables]\nPORT = \"3001\"\nNODE_ENV = \"production\"\n\n[services.backend.deploy]\nhealthcheckPath = \"/health\"\nhealthcheckTimeout = 300\nrestartPolicyType = \"ON_FAILURE\"\nrestartPolicyMaxRetries = 3\n\n[[services]]\nname = \"frontend\"\nsource = \"frontend\"\ndockerfile = \"frontend/Dockerfile\"\n\n[services.frontend.deploy]\nhealthcheckPath = \"/\"\n```\n\n## Step 4: Set Environment Variables\n\n```bash\n# Backend secrets (never commit these)\nrailway variables set \\\n  --service backend \\\n  NODE_ENV=production \\\n  JWT_SECRET=$(openssl rand -base64 32) \\\n  CORS_ORIGIN=https://your-frontend.railway.app\n\n# Frontend build-time vars\nrailway variables set \\\n  --service frontend \\\n  VITE_API_URL=https://your-backend.railway.app\n```\n\n## Step 5: Run Migrations Before Deploying App\n\n```bash\n# Get Railway DATABASE_URL\nDB_URL=$(railway variables get DATABASE_URL --service backend)\n\n# Run migrations against Railway DB\nDATABASE_URL=\"$DB_URL\" npm run migrate:up --prefix backend\n\necho \"Migrations complete\"\n```\n\n## Step 6: Deploy\n\n```bash\n# Deploy all services\nrailway up --detach\n\n# Watch deployment logs\nrailway logs --service backend\nrailway logs --service frontend\n\n# Get deployment URLs\nrailway domain --service backend   # → https://backend-xxx.railway.app\nrailway domain --service frontend  # → https://frontend-xxx.railway.app\n```\n\n## Step 7: Post-Deploy Verification\n\n```bash\nBACKEND_URL=$(railway domain --service backend)\nFRONTEND_URL=$(railway domain --service frontend)\n\n# Health check backend\ncurl -sf \"https://${BACKEND_URL}/health\" | jq . && echo \"BACKEND HEALTH: OK\"\n\n# Check frontend loads\ncurl -sf \"https://${FRONTEND_URL}\" | grep -q \"<!DOCTYPE html>\" && echo \"FRONTEND: OK\"\n\n# Smoke test key API endpoint\ncurl -sf \"https://${BACKEND_URL}/api/v1/status\" | jq . && echo \"API STATUS: OK\"\n\n# Run Playwright smoke tests against live URL (optional but recommended)\nPLAYWRIGHT_BASE_URL=\"https://${FRONTEND_URL}\" npx playwright test --grep=\"@smoke\"\n```\n\n## Step 8: Rollback (If Needed)\n\n```bash\n# List recent deployments\nrailway deployments --service backend\n\n# Roll back to previous deployment\nrailway rollback --service backend --deployment <DEPLOYMENT_ID>\n```\n\n## Verification Gate\n\nAll must pass before considering deploy complete:\n\n| Check | Command | Expected |\n|-------|---------|----------|\n| Backend health | `curl /health` | `{\"status\":\"ok\"}` |\n| Frontend loads | `curl /` | 200 + HTML |\n| DB connection | `curl /api/status` | 200 |\n| No error logs | `railway logs` | No ERROR in last 50 lines |\n\n```bash\n# Final gate check\necho \"=== DEPLOY VERIFICATION ===\"\ncurl -sf \"https://${BACKEND_URL}/health\" && echo \"✓ Backend healthy\"\ncurl -sf \"https://${FRONTEND_URL}\" > /dev/null && echo \"✓ Frontend live\"\nrailway logs --service backend --lines 50 | grep -c \"ERROR\" | \\\n  xargs -I{} sh -c '[ {} -eq 0 ] && echo \"✓ No errors in logs\" || echo \"✗ Errors found\"'\necho \"==========================\"\necho \"Live URLs:\"\necho \"  Frontend: https://${FRONTEND_URL}\"\necho \"  Backend:  https://${BACKEND_URL}\"\n```\n\n## Railway Tips\n- **Auto-deploy on push:** Connect your GitHub repo in Railway dashboard → every push to `main` triggers deploy\n- **Environment parity:** Railway staging environment mirrors production — use `railway environment staging`\n- **Costs:** Railway charges per vCPU/memory usage — check dashboard for billing alerts\n- **Logs retention:** 7 days by default — export critical logs if needed"}];
+
+const SOURCE_COLORS = {
+  anthropic: '#d97706',
+  vercel: '#6b7280',
+  'obra/superpowers': '#7c3aed',
+  'ai-skills': '#0369a1',
+};
+
+function phaseBadgeClass(phase) {
+  if (phase.includes('Spec')) return 'p-spec';
+  if (phase.includes('Scaffold')) return 'p-scaffold';
+  if (phase.includes('Develop')) return 'p-develop';
+  if (phase.includes('Review')) return 'p-review';
+  if (phase.includes('Test')) return 'p-test';
+  if (phase.includes('Quality')) return 'p-quality';
+  if (phase.includes('Build')) return 'p-build';
+  if (phase.includes('Deploy')) return 'p-deploy';
+  return 'p-ref';
+}
+
+// Render sidebar
+function renderSidebar(filter = '') {
+  const phases = {};
+  for (const s of SKILLS) {
+    if (filter && !s.name.includes(filter) && !s.description.toLowerCase().includes(filter)) continue;
+    if (!phases[s.phase]) phases[s.phase] = [];
+    phases[s.phase].push(s);
+  }
+
+  const container = document.getElementById('sidebarList');
+  container.innerHTML = '';
+
+  for (const [phase, items] of Object.entries(phases)) {
+    const group = document.createElement('div');
+    group.className = 'phase-group';
+    group.innerHTML = `<div class="phase-label">${phase}</div>` +
+      items.map(s => `
+        <div class="skill-item" data-name="${s.name}" onclick="showSkill('${s.name}')">
+          <span class="source-dot" style="background:${SOURCE_COLORS[s.source] || '#94a3b8'}"></span>
+          <span class="skill-name">${s.name}</span>
+        </div>
+      `).join('');
+    container.appendChild(group);
+  }
+}
+
+// Render SDLC flow pills
+function renderFlow() {
+  const mainFlow = SKILLS.filter(s => s.phase !== 'Reference');
+  const container = document.getElementById('sdlcFlow');
+  const grouped = {};
+  for (const s of mainFlow) {
+    if (!grouped[s.phase]) grouped[s.phase] = [];
+    grouped[s.phase].push(s);
+  }
+
+  const phases = Object.entries(grouped);
+  phases.forEach(([phase, items], i) => {
+    items.forEach(s => {
+      const step = document.createElement('div');
+      step.className = 'flow-step';
+      step.innerHTML = `<span class="flow-pill" onclick="showSkill('${s.name}')">${s.name}</span>`;
+      container.appendChild(step);
+    });
+    if (i < phases.length - 1) {
+      const arrow = document.createElement('span');
+      arrow.className = 'flow-arrow';
+      arrow.textContent = '→';
+      container.appendChild(arrow);
+    }
+  });
+}
+
+// Render stats
+function renderStats() {
+  const bySource = {};
+  for (const s of SKILLS) bySource[s.source] = (bySource[s.source] || 0) + 1;
+  const phases = new Set(SKILLS.map(s => s.phase)).size;
+
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card"><div class="stat-value">${SKILLS.length}</div><div class="stat-label">Total Skills</div></div>
+    <div class="stat-card"><div class="stat-value">${phases}</div><div class="stat-label">SDLC Phases</div></div>
+    <div class="stat-card"><div class="stat-value">${bySource['ai-skills'] || 0}</div><div class="stat-label">Custom Skills</div></div>
+    <div class="stat-card"><div class="stat-value">${SKILLS.length - (bySource['ai-skills'] || 0)}</div><div class="stat-label">From Open Source</div></div>
+  `;
+}
+
+// Render skills grid
+function renderGrid(filter = '') {
+  const filtered = SKILLS.filter(s =>
+    !filter || s.name.includes(filter) || s.description.toLowerCase().includes(filter)
+  );
+  document.getElementById('skillsGrid').innerHTML = filtered.map(s => `
+    <div class="skill-card" onclick="showSkill('${s.name}')">
+      <div class="card-header">
+        <span class="card-name">${s.name}</span>
+        <span class="phase-badge ${phaseBadgeClass(s.phase)}">${s.phase}</span>
+      </div>
+      <div class="card-desc">${s.description.split('.')[0]}.</div>
+    </div>
+  `).join('');
+}
+
+// Show skill detail
+function showSkill(name) {
+  const skill = SKILLS.find(s => s.name === name);
+  if (!skill) return;
+
+  document.getElementById('welcomeView').style.display = 'none';
+  const detail = document.getElementById('detailView');
+  detail.classList.add('visible');
+
+  document.getElementById('detailTitle').textContent = skill.name;
+  document.getElementById('detailBadges').innerHTML = `
+    <span class="badge ${phaseBadgeClass(skill.phase)}">${skill.phase}</span>
+    <span class="badge" style="background:#f1f5f9;color:#475569">
+      ${skill.source}
+    </span>
+  `;
+
+  const rendered = marked.parse(skill.body);
+  document.getElementById('detailBody').innerHTML = rendered;
+
+  // Syntax highlight
+  document.querySelectorAll('#detailBody pre code').forEach(el => hljs.highlightElement(el));
+
+  // Update active sidebar item
+  document.querySelectorAll('.skill-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.name === name);
+  });
+
+  window.scrollTo(0, 0);
+}
+
+function showWelcome() {
+  document.getElementById('welcomeView').style.display = '';
+  document.getElementById('detailView').classList.remove('visible');
+  document.querySelectorAll('.skill-item').forEach(el => el.classList.remove('active'));
+}
+
+// Search
+document.getElementById('searchInput').addEventListener('input', e => {
+  const q = e.target.value.toLowerCase();
+  renderSidebar(q);
+  renderGrid(q);
+});
+
+// Init
+marked.setOptions({ breaks: true, gfm: true });
+renderSidebar();
+renderFlow();
+renderStats();
+renderGrid();
+</script>
+</body>
+</html>
